@@ -26,6 +26,7 @@ public class ProductAdapter extends RecyclerView.Adapter {
         public final TextView priceTextView;
         public final CheckBox boughtCheckBox;
 
+
         public ViewHolder(View view) {
             super(view);
             this.view = view;
@@ -54,6 +55,7 @@ public class ProductAdapter extends RecyclerView.Adapter {
 
         viewHolder.productTextView.setText(product.getProduct());
         viewHolder.priceTextView.setText(String.format("%.2f", product.getPrice()));
+
     }
 
     @Override
@@ -65,7 +67,6 @@ public class ProductAdapter extends RecyclerView.Adapter {
             return 0;
         }
     }
-
 }
 
 
