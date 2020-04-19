@@ -4,12 +4,15 @@ public class Product {
 
     private String product;
     private double price;
-    private boolean bought;
+    private boolean bought = false;
 
-    public Product(String product, double price, boolean bought) {
+    public Product(String product, double price) {
         this.product = product;
         this.price = price;
-        this.bought = bought;
+    }
+
+    public Product(String product) {
+        this.product = product;
     }
 
     public String getProduct() {

@@ -3,14 +3,17 @@ package com.tommyapps.shop;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import static com.tommyapps.shop.R.id.boughtCheckBox;
 import static com.tommyapps.shop.R.id.productTextView;
 
 public class ProductAdapter extends RecyclerView.Adapter {
@@ -18,6 +21,7 @@ public class ProductAdapter extends RecyclerView.Adapter {
     public ProductAdapter(ArrayList<Product> products) {
         this.products = products;
     }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -54,7 +58,9 @@ public class ProductAdapter extends RecyclerView.Adapter {
         ViewHolder viewHolder = (ViewHolder) holder;
 
         viewHolder.productTextView.setText(product.getProduct());
-        viewHolder.priceTextView.setText(String.format("%.2f", product.getPrice()));
+        if (product.getPrice() != 0) {
+            viewHolder.priceTextView.setText(String.format("%.2f", product.getPrice()));
+        }
 
     }
 
@@ -67,6 +73,7 @@ public class ProductAdapter extends RecyclerView.Adapter {
             return 0;
         }
     }
+
 }
 
 
