@@ -199,8 +199,6 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
         priceTextView = view.findViewById(R.id.priceTextView);
         boughtCheckBox = view.findViewById(R.id.boughtCheckBox);
 
-        Toast.makeText(this, String.valueOf(position), Toast.LENGTH_SHORT).show();
-
        // this.productTextView = (TextView) view.findViewById(R.id.productTextView);
        // this.priceTextView = (TextView) findViewById(R.id.priceTextView);
        // this.boughtCheckBox = (CheckBox) findViewById(R.id.boughtCheckBox);
