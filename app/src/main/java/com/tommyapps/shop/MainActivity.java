@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ProductAdapter.OnItemClickListener {
 
     Dialog addProductDialog;
 
@@ -37,10 +37,14 @@ public class MainActivity extends AppCompatActivity {
     private EditText priceEditText;
     private CheckBox enablePriceCheckBox;
 
-    private double totalPrice = 0;
-    private int boughtProductCounter;
+    private TextView productTextView;
+    private TextView priceTextView;
+    private CheckBox boughtCheckBox;
 
-   /* private ArrayList<Product> initProducts() {
+    private double totalPrice = 0;
+    private int boughtProductCounter = 0;
+
+    private ArrayList<Product> initProducts() {
         ArrayList<Product> list = new ArrayList<>();
 
         list.add(new Product("Ziemniaki", 3.39));
@@ -51,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         list.add(new Product("Piwko", 2.59));
 
         return list;
-    } */
+    }
 
     public void showAddProductPopUp(View view) {
 
@@ -169,21 +173,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       // products = initProducts();
+        products = initProducts();
         this.productCounterTextView = (TextView) findViewById(R.id.productCounterTextView);
         this.totalPriceTextView = (TextView) findViewById(R.id.totalPriceTextView);
+        this.boughtProductCounterTextView = (TextView) findViewById(R.id.boughtProductCounterTextView);
 
         this.recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         this.recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new ProductAdapter(products);
+        adapter = new ProductAdapter(products, this);
         this.recyclerView.setAdapter(adapter);
 
         productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
         totalPriceTextView.setText(String.format("%.2f", totalPrice));
 
         addProductDialog = new Dialog(this);
+
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+
+        productTextView = view.findViewById(R.id.productTextView);
+        priceTextView = view.findViewById(R.id.priceTextView);
+        boughtCheckBox = view.findViewById(R.id.boughtCheckBox);
+
+        Toast.makeText(this, String.valueOf(position), Toast.LENGTH_SHORT).show();
+
+       // this.productTextView = (TextView) view.findViewById(R.id.productTextView);
+       // this.priceTextView = (TextView) findViewById(R.id.priceTextView);
+       // this.boughtCheckBox = (CheckBox) findViewById(R.id.boughtCheckBox);
+
+        if (boughtCheckBox.isChecked()) {
+            boughtCheckBox.setChecked(false);
+            productTextView.setAlpha(1f);
+            priceTextView.setAlpha(1f);
+            boughtProductCounter--;
+        } else {
+            boughtCheckBox.setChecked(true);
+            productTextView.setAlpha(0.25f);
+            priceTextView.setAlpha(0.25f);
+            boughtProductCounter++;
+        }
+        boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
 
     }
 }
