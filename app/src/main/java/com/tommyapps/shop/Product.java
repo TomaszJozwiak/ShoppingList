@@ -3,16 +3,22 @@ package com.tommyapps.shop;
 public class Product {
 
     private String product;
-    private double price;
+    private double price = 0;
     private boolean bought = false;
+
+    public Product(String product) {
+        this.product = product;
+    }
 
     public Product(String product, double price) {
         this.product = product;
         this.price = price;
     }
 
-    public Product(String product) {
+    public Product(String product, double price, boolean bought) {
         this.product = product;
+        this.price = price;
+        this.bought = bought;
     }
 
     public String getProduct() {

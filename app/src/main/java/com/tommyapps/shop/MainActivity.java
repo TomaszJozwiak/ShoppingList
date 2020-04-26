@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
     private TextView priceTextView;
     private CheckBox boughtCheckBox;
 
+    private Database db;
+
     private double totalPrice = 0;
     private int boughtProductCounter = 0;
 
@@ -138,24 +140,27 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
             Toast.makeText(MainActivity.this, "Wpisz nazwę produktu", Toast.LENGTH_SHORT).show();
             productEditText.requestFocus();
         } else {
+            String productName = productEditText.getText().toString();
+            String price = "0";
             if (enablePriceCheckBox.isChecked()) {
 
                 if (priceEditText.getText().toString().matches("")) {
                     Toast.makeText(MainActivity.this, "Wpisz cenę", Toast.LENGTH_SHORT).show();
                     priceEditText.requestFocus();
                 } else {
-                    products.add(new Product(productEditText.getText().toString(), Double.valueOf(priceEditText.getText().toString())));
-                    totalPrice += Double.valueOf(priceEditText.getText().toString());
+                    price = priceEditText.getText().toString();
+                    products.add(new Product(productName, Double.valueOf(price)));
+                    totalPrice += Double.valueOf(price);
                     priceEditText.setText("");
-                    Toast.makeText(MainActivity.this, "Dodano produkt: " + productEditText.getText().toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
                     adapter.notifyDataSetChanged();
                     productEditText.setText("");
                     productEditText.requestFocus();
                 }
 
             } else {
-                products.add(new Product(productEditText.getText().toString()));
-                Toast.makeText(MainActivity.this, "Dodano produkt: " + productEditText.getText().toString(), Toast.LENGTH_SHORT).show();
+                products.add(new Product(productName));
+               // Toast.makeText(MainActivity.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
                 adapter.notifyDataSetChanged();
                 productEditText.setText("");
                 productEditText.requestFocus();
@@ -164,6 +169,9 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
             productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
             totalPriceTextView.setText(String.format("%.2f", totalPrice));
 
+            db.insertProduct(productName, price);
+            int numberOfRows = db.numberOfRows();
+            Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -173,7 +181,10 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        products = initProducts();
+        db = new Database(this);
+
+        //products = initProducts();
+        products = db.getProducts();
         this.productCounterTextView = (TextView) findViewById(R.id.productCounterTextView);
         this.totalPriceTextView = (TextView) findViewById(R.id.totalPriceTextView);
         this.boughtProductCounterTextView = (TextView) findViewById(R.id.boughtProductCounterTextView);
@@ -187,8 +198,13 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
 
         productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
         totalPriceTextView.setText(String.format("%.2f", totalPrice));
+        boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
 
         addProductDialog = new Dialog(this);
+
+
+        int numberOfRows = db.numberOfRows();
+        Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
 
     }
 
@@ -199,17 +215,15 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
         priceTextView = view.findViewById(R.id.priceTextView);
         boughtCheckBox = view.findViewById(R.id.boughtCheckBox);
 
-       // this.productTextView = (TextView) view.findViewById(R.id.productTextView);
-       // this.priceTextView = (TextView) findViewById(R.id.priceTextView);
-       // this.boughtCheckBox = (CheckBox) findViewById(R.id.boughtCheckBox);
-
         if (boughtCheckBox.isChecked()) {
             boughtCheckBox.setChecked(false);
+            db.updateIsBought(position, boughtCheckBox.isChecked());
             productTextView.setAlpha(1f);
             priceTextView.setAlpha(1f);
             boughtProductCounter--;
         } else {
             boughtCheckBox.setChecked(true);
+            db.updateIsBought(position, boughtCheckBox.isChecked());
             productTextView.setAlpha(0.25f);
             priceTextView.setAlpha(0.25f);
             boughtProductCounter++;
