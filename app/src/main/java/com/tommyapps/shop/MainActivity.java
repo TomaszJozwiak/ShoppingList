@@ -185,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
 
         //products = initProducts();
         products = db.getProducts();
+        totalPrice = getTotalPriceFromProductList(products);
+        boughtProductCounter = getBoughtItemCounterFromProductList(products);
         this.productCounterTextView = (TextView) findViewById(R.id.productCounterTextView);
         this.totalPriceTextView = (TextView) findViewById(R.id.totalPriceTextView);
         this.boughtProductCounterTextView = (TextView) findViewById(R.id.boughtProductCounterTextView);
@@ -230,5 +232,29 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.On
         }
         boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
 
+    }
+
+    private double getTotalPriceFromProductList(ArrayList<Product> products){
+
+        double price = 0;
+
+        for (Product productPrice : products) {
+            price += Double.valueOf(productPrice.getPrice());
+        }
+
+        return price;
+    }
+
+    private int getBoughtItemCounterFromProductList(ArrayList<Product> products){
+
+        int productCounter = 0;
+
+        for (Product product : products) {
+            if (product.isBought()) {
+                productCounter++;
+            }
+        }
+
+        return productCounter;
     }
 }
