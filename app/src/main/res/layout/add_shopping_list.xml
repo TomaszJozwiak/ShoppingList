@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/addShoppingListPopUpConstraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="#69B7E6">
+
+    <TextView
+        android:id="@+id/shoppingListTextViewAddProductPopup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nazwa listy"
+        android:textColor="#FFEB3B"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.07999998" />
+
+    <EditText
+        android:id="@+id/shoppingListEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="Nazwa Listy"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/shoppingListTextViewAddProductPopup" />
+
+    <Button
+        android:id="@+id/addShoppingListPopUpButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/button_with_round_corners_green"
+        android:minWidth="150dp"
+        android:text="Dodaj"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/shoppingListEditText" />
+
+    <Button
+        android:id="@+id/cancelShoppingListPopUpButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/button_with_round_corners_red"
+        android:minWidth="150dp"
+        android:text="@android:string/cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/shoppingListEditText" />
+</androidx.constraintlayout.widget.ConstraintLayout>

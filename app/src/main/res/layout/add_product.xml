@@ -23,7 +23,7 @@
         app:layout_constraintVertical_bias="0.100000024" />
 
     <EditText
-        android:id="@+id/productEditText"
+        android:id="@+id/shoppingListEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -45,7 +45,7 @@
         app:layout_constraintBottom_toTopOf="@+id/priceTextViewAddProductPopup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/shoppingListEditText" />
 
     <TextView
         android:id="@+id/priceTextViewAddProductPopup"
@@ -78,7 +78,7 @@
         app:layout_constraintTop_toBottomOf="@+id/priceTextViewAddProductPopup" />
 
     <Button
-        android:id="@+id/addProductPopUpButton"
+        android:id="@+id/addShoppingListPopUpButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
@@ -91,7 +91,7 @@
         app:layout_constraintTop_toBottomOf="@+id/priceEditText" />
 
     <Button
-        android:id="@+id/cancelPopUpButton"
+        android:id="@+id/cancelShoppingListPopUpButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"

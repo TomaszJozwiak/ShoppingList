@@ -2,17 +2,19 @@ package com.tommyapps.shop;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.inputmethodservice.KeyboardView;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,240 +23,153 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements ProductAdapter.OnItemClickListener {
+public class MainActivity extends AppCompatActivity {
 
-    Dialog addProductDialog;
-
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private TextView productCounterTextView;
-    private TextView boughtProductCounterTextView;
-    private TextView totalPriceTextView;
-    private ArrayList<Product> products = new ArrayList<>();
-    private EditText productEditText;
-    private EditText priceEditText;
-    private CheckBox enablePriceCheckBox;
-
-    private TextView productTextView;
-    private TextView priceTextView;
-    private CheckBox boughtCheckBox;
-
-    private Database db;
-
-    private double totalPrice = 0;
-    private int boughtProductCounter = 0;
-
-    private ArrayList<Product> initProducts() {
-        ArrayList<Product> list = new ArrayList<>();
-
-        list.add(new Product("Ziemniaki", 3.39));
-        list.add(new Product("Piwko", 2.59));
-        list.add(new Product("Winko", 5));
-        list.add(new Product("Chipsy", 2.1));
-        list.add(new Product("Ziemniaksdafasdfasdfasdf asdf asdf asdf a sdf asdfi", 3.39));
-        list.add(new Product("Piwko", 2.59));
-
-        return list;
-    }
-
-    public void showAddProductPopUp(View view) {
-
-        final Button cancelPopUpButton;
-        final Button addProductPopUpButton;
-        final TextView priceTextViewAddProductPopup;
-
-        addProductDialog.setContentView(R.layout.add_product);
-
-        productEditText = (EditText) addProductDialog.findViewById(R.id.productEditText);
-        priceEditText = (EditText) addProductDialog.findViewById(R.id.priceEditText);
-        cancelPopUpButton = (Button) addProductDialog.findViewById(R.id.cancelPopUpButton);
-        addProductPopUpButton = (Button) addProductDialog.findViewById(R.id.addProductPopUpButton);
-        enablePriceCheckBox = (CheckBox) addProductDialog.findViewById(R.id.enablePriceCheckBox);
-        priceTextViewAddProductPopup = (TextView) addProductDialog.findViewById(R.id.priceTextViewAddProductPopup);
-
-        enablePriceCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (enablePriceCheckBox.isChecked()) {
-                    priceEditText.setEnabled(true);
-                    priceEditText.setAlpha(1f);
-                    priceTextViewAddProductPopup.setAlpha(1f);
-                } else {
-                    priceEditText.setEnabled(false);
-                    priceEditText.setAlpha(0.5f);
-                    priceTextViewAddProductPopup.setAlpha(0.3f);
-                }
-
-            }
-        });
-
-        cancelPopUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addProductDialog.dismiss();
-            }
-        });
-
-        addProductPopUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addProduct();
-            }
-        });
-
-
-        productEditText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    addProduct();
-                }
-                return false;
-            }
-        });
-
-        priceEditText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    addProduct();
-                }
-                return false;
-            }
-        });
-
-        addProductDialog.show();
-        Window window = addProductDialog.getWindow();
-        window.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
-    }
-
-
-    public void addProduct() {
-
-        if (productEditText.getText().toString().matches("")) {
-            Toast.makeText(MainActivity.this, "Wpisz nazwę produktu", Toast.LENGTH_SHORT).show();
-            productEditText.requestFocus();
-        } else {
-            String productName = productEditText.getText().toString();
-            String price = "0";
-            if (enablePriceCheckBox.isChecked()) {
-
-                if (priceEditText.getText().toString().matches("")) {
-                    Toast.makeText(MainActivity.this, "Wpisz cenę", Toast.LENGTH_SHORT).show();
-                    priceEditText.requestFocus();
-                } else {
-                    price = priceEditText.getText().toString();
-                    products.add(new Product(productName, Double.valueOf(price)));
-                    totalPrice += Double.valueOf(price);
-                    priceEditText.setText("");
-                    Toast.makeText(MainActivity.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
-                    adapter.notifyDataSetChanged();
-                    productEditText.setText("");
-                    productEditText.requestFocus();
-                }
-
-            } else {
-                products.add(new Product(productName));
-               // Toast.makeText(MainActivity.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
-                adapter.notifyDataSetChanged();
-                productEditText.setText("");
-                productEditText.requestFocus();
-            }
-
-            productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
-            totalPriceTextView.setText(String.format("%.2f", totalPrice));
-
-            db.insertProduct(productName, price);
-            int numberOfRows = db.numberOfRows();
-            Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
-        }
-    }
-
+    private ArrayList<String> shoppingList = new ArrayList<String>();
+    private TextView shoppingListEditText;
+    private SharedPreferences sharedPreferences;
+    private ListView shoppingListView;
+    private ArrayAdapter<String> shoppingListArrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        db = new Database(this);
+        sharedPreferences = this.getSharedPreferences("com.tommyapps.shop", Context.MODE_PRIVATE);
 
-        //products = initProducts();
-        products = db.getProducts();
-        totalPrice = getTotalPriceFromProductList(products);
-        boughtProductCounter = getBoughtItemCounterFromProductList(products);
-        this.productCounterTextView = (TextView) findViewById(R.id.productCounterTextView);
-        this.totalPriceTextView = (TextView) findViewById(R.id.totalPriceTextView);
-        this.boughtProductCounterTextView = (TextView) findViewById(R.id.boughtProductCounterTextView);
+        shoppingListView = (ListView) findViewById(R.id.shoppingListView);
 
-        this.recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        this.recyclerView.setLayoutManager(mLayoutManager);
+        shoppingList = loadArray();
 
-        adapter = new ProductAdapter(products, this);
-        this.recyclerView.setAdapter(adapter);
-
-        productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
-        totalPriceTextView.setText(String.format("%.2f", totalPrice));
-        boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
-
-        addProductDialog = new Dialog(this);
+       /* shoppingList.add("Tomek");
+        shoppingList.add("Kasia");
+        shoppingList.add("Maciek");
+        shoppingList.add("Alicja"); */
 
 
-        int numberOfRows = db.numberOfRows();
-        Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
+        shoppingListArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, shoppingList);
+
+        shoppingListView.setAdapter(shoppingListArrayAdapter);
+
+        shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Toast.makeText(getApplicationContext(), shoppingList.get(i), Toast.LENGTH_SHORT).show();
+
+            }
+        });
 
     }
 
-    @Override
-    public void onItemClick(View view, int position) {
+    public void showAddShoppingListPopUp(View view) {
 
-        productTextView = view.findViewById(R.id.productTextView);
-        priceTextView = view.findViewById(R.id.priceTextView);
-        boughtCheckBox = view.findViewById(R.id.boughtCheckBox);
+        final Button cancelShoppingListPopUpButton;
+        final Button addShoppingListPopUpButton;
+        final Dialog addShoppingListDialog = new Dialog(this);
 
-        if (boughtCheckBox.isChecked()) {
-            boughtCheckBox.setChecked(false);
-            db.updateIsBought(position, boughtCheckBox.isChecked());
-            productTextView.setAlpha(1f);
-            priceTextView.setAlpha(1f);
-            boughtProductCounter--;
+        addShoppingListDialog.setContentView(R.layout.add_shopping_list);
+
+        cancelShoppingListPopUpButton = (Button) addShoppingListDialog.findViewById(R.id.cancelShoppingListPopUpButton);
+        addShoppingListPopUpButton = (Button) addShoppingListDialog.findViewById(R.id.addShoppingListPopUpButton);
+        shoppingListEditText = (TextView) addShoppingListDialog.findViewById(R.id.shoppingListEditText);
+
+
+        cancelShoppingListPopUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addShoppingListDialog.dismiss();
+            }
+        });
+
+        addShoppingListPopUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addShoppingList();
+            }
+        });
+
+
+        shoppingListEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    addShoppingList();
+                }
+                return false;
+            }
+        });
+
+        addShoppingListDialog.show();
+        Window window = addShoppingListDialog.getWindow();
+        window.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+    }
+
+    public void addShoppingList() {
+
+        String shoppingListName = shoppingListEditText.getText().toString();
+
+        if (shoppingListName.matches("")) {
+            Toast.makeText(this, "Proszę wprowadzić nazwę listy zakupów", Toast.LENGTH_SHORT).show();
         } else {
-            boughtCheckBox.setChecked(true);
-            db.updateIsBought(position, boughtCheckBox.isChecked());
-            productTextView.setAlpha(0.25f);
-            priceTextView.setAlpha(0.25f);
-            boughtProductCounter++;
+            if (alreadyExists(shoppingListName)) {
+                Toast.makeText(this, "Istnieje już lista o nazwie: " + shoppingListName, Toast.LENGTH_SHORT).show();
+            } else {
+                shoppingList.add(shoppingListName);
+                saveArray();
+                shoppingListArrayAdapter.notifyDataSetChanged();
+                Intent intent = new Intent(this, ShoppingList.class);
+                //intent.putExtra("shoppingList", shoppingListName);
+                startActivity(intent);
+
+            }
+
         }
-        boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
 
     }
 
-    private double getTotalPriceFromProductList(ArrayList<Product> products){
+    private boolean alreadyExists(String shoppingListName) {
 
-        double price = 0;
+        for (String shoppingListArrayName : shoppingList) {
 
-        for (Product productPrice : products) {
-            price += Double.valueOf(productPrice.getPrice());
-        }
-
-        return price;
-    }
-
-    private int getBoughtItemCounterFromProductList(ArrayList<Product> products){
-
-        int productCounter = 0;
-
-        for (Product product : products) {
-            if (product.isBought()) {
-                productCounter++;
+            if (shoppingListArrayName.matches(shoppingListName)) {
+                return true;
             }
         }
 
-        return productCounter;
+        return false;
     }
+
+    private void saveArray() {
+
+        try {
+            sharedPreferences.edit().putString("shoppingList", ObjectSerializer.serialize(shoppingList)).apply();
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private ArrayList<String> loadArray() {
+
+        ArrayList<String> newShoppingList = new ArrayList<>();
+
+        try {
+            newShoppingList = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("shoppingList", ObjectSerializer.serialize(new ArrayList<String>())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return newShoppingList;
+
+    }
+
 }
