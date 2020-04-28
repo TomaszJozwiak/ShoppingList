@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setTitle("TommyShoppingList");
+
         sharedPreferences = this.getSharedPreferences("com.tommyapps.shop", Context.MODE_PRIVATE);
 
         shoppingListView = (ListView) findViewById(R.id.shoppingListView);
@@ -62,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Toast.makeText(getApplicationContext(), shoppingList.get(i), Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(MainActivity.this, ShoppingList.class);
+                intent.putExtra("shoppingList", shoppingList.get(i));
+                startActivity(intent);
 
             }
         });
@@ -126,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 saveArray();
                 shoppingListArrayAdapter.notifyDataSetChanged();
                 Intent intent = new Intent(this, ShoppingList.class);
-                //intent.putExtra("shoppingList", shoppingListName);
+                intent.putExtra("shoppingList", shoppingListName);
                 startActivity(intent);
 
             }

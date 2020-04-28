@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -177,6 +178,11 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
         setContentView(R.layout.shopping_list);
 
         db = new Database(this);
+
+        Intent intent = getIntent();
+        db.setShoppingListTableName(intent.getStringExtra("shoppingList"));
+        setTitle(intent.getStringExtra("shoppingList"));
+
 
         //products = initProducts();
         products = db.getProducts();

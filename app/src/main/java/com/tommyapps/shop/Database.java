@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQuery;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,13 +16,17 @@ import java.util.ArrayList;
 
 public class Database extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "ShopListDatabase.db";
-    public static final String PRODUCTS_TABLE_NAME = "products";
-    public static final String PRODUCTS_COLUMN_ID = "id";
-    public static final String PRODUCTS_COLUMN_PRODUCT = "product";
-    public static final String PRODUCTS_COLUMN_PRICE = "price";
-    public static final String PRODUCTS_COLUMN_ISBOUGHT = "isBought";
-    public static final String PRODUCTS_COLUMN_POSITION = "position";
+    private static final String DATABASE_NAME = "ShopListDatabase.db";
+
+    private static final String PRODUCTS_TABLE_NAME = "products";
+    private static final String PRODUCTS_COLUMN_PRODUCT = "product";
+    private static final String PRODUCTS_COLUMN_PRICE = "price";
+    private static final String PRODUCTS_COLUMN_IS_BOUGHT = "isBought";
+    private static final String PRODUCTS_COLUMN_POSITION = "position";
+    private static final String PRODUCTS_COLUMN_SHOPPING_LIST = "shoppingList";
+
+    public String shoppingListName = "Lista Kasi";
+
 
     public ArrayList<Product> products = new ArrayList<Product>();
 
@@ -32,7 +37,7 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE products (id INTEGER PRIMARY KEY, product VARCHAR, price VARCHAR, isBought INTEGER, position INTEGER)");
+        db.execSQL("CREATE TABLE products (id INTEGER PRIMARY KEY, product VARCHAR, price VARCHAR, isBought INTEGER, position INTEGER, shoppingList VARCHAR)");
     }
 
     @Override
@@ -57,8 +62,9 @@ public class Database extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(PRODUCTS_COLUMN_PRODUCT, product);
         contentValues.put(PRODUCTS_COLUMN_PRICE, price);
-        contentValues.put(PRODUCTS_COLUMN_ISBOUGHT, 0);
-        contentValues.put(PRODUCTS_COLUMN_POSITION, this.numberOfRows());
+        contentValues.put(PRODUCTS_COLUMN_IS_BOUGHT, 0);
+        contentValues.put(PRODUCTS_COLUMN_POSITION, this.getNumberOfRowsInShoppingList());
+        contentValues.put(PRODUCTS_COLUMN_SHOPPING_LIST, shoppingListName);
 
         db.insert(PRODUCTS_TABLE_NAME, null, contentValues);
 
@@ -74,8 +80,16 @@ public class Database extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(PRODUCTS_COLUMN_ISBOUGHT, isBoughtInt);
-        db.update(PRODUCTS_TABLE_NAME, contentValues, "position = ? ", new String[] { Integer.toString(position) } );
+        contentValues.put(PRODUCTS_COLUMN_IS_BOUGHT, isBoughtInt);
+        db.update(PRODUCTS_TABLE_NAME, contentValues, PRODUCTS_COLUMN_POSITION + " = ? AND " + PRODUCTS_COLUMN_SHOPPING_LIST + " = ?", new String[] {Integer.toString(position),  shoppingListName} );
+
+    }
+
+    private int getNumberOfRowsInShoppingList() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        int numRows = (int) DatabaseUtils.queryNumEntries(db, PRODUCTS_TABLE_NAME, PRODUCTS_COLUMN_SHOPPING_LIST + " = ?", new String[] {shoppingListName});
+        return numRows;
 
     }
 
@@ -84,11 +98,13 @@ public class Database extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor c = db.rawQuery("SELECT * FROM products", null);
+        String query = "SELECT * FROM " + PRODUCTS_TABLE_NAME + " WHERE " + PRODUCTS_COLUMN_SHOPPING_LIST + " = '" + shoppingListName + "'";
+
+        Cursor c = db.rawQuery(query, null);
 
         int productIndex = c.getColumnIndex(PRODUCTS_COLUMN_PRODUCT);
         int priceIndex = c.getColumnIndex(PRODUCTS_COLUMN_PRICE);
-        int isBoughtIndex = c.getColumnIndex(PRODUCTS_COLUMN_ISBOUGHT);
+        int isBoughtIndex = c.getColumnIndex(PRODUCTS_COLUMN_IS_BOUGHT);
 
         c.moveToFirst();
 
@@ -110,6 +126,9 @@ public class Database extends SQLiteOpenHelper {
         }
 
         return products;
+    }
 
+    public void setShoppingListTableName(String shoppingList) {
+        this.shoppingListName = shoppingList;
     }
 }
