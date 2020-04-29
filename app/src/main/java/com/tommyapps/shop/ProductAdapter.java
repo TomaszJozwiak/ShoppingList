@@ -21,7 +21,6 @@ public class ProductAdapter extends RecyclerView.Adapter {
         this.myOnItemClickListener = onItemClickListener;
     }
 
-
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public final View view;

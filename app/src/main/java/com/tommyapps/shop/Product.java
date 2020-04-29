@@ -5,6 +5,7 @@ public class Product {
     private String product;
     private double price = 0;
     private boolean bought = false;
+    private int id = 0;
 
     public Product(String product) {
         this.product = product;
@@ -19,6 +20,13 @@ public class Product {
         this.product = product;
         this.price = price;
         this.bought = bought;
+    }
+
+    public Product(String product, double price, boolean bought, int id) {
+        this.product = product;
+        this.price = price;
+        this.bought = bought;
+        this.id = id;
     }
 
     public String getProduct() {
@@ -43,5 +51,9 @@ public class Product {
 
     public void setBought(boolean bought) {
         this.bought = bought;
+    }
+
+    public int getId() {
+        return id;
     }
 }

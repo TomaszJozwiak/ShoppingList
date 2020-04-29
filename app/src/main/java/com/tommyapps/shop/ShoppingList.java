@@ -1,14 +1,19 @@
 package com.tommyapps.shop;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -28,7 +33,6 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
     private TextView productCounterTextView;
     private TextView boughtProductCounterTextView;
     private TextView totalPriceTextView;
-    private ArrayList<Product> products = new ArrayList<>();
     private EditText productEditText;
     private EditText priceEditText;
     private CheckBox enablePriceCheckBox;
@@ -36,6 +40,8 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
     private TextView productTextView;
     private TextView priceTextView;
     private CheckBox boughtCheckBox;
+
+    private ArrayList<Product> products = new ArrayList<>();
 
     private Database db;
 
@@ -53,6 +59,67 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
         list.add(new Product("Piwko", 2.59));
 
         return list;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.product_list_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case R.id.deleteAllSelectedProducts:
+                showDeleteAllProductsAlert();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void showDeleteAllProductsAlert() {
+
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Usuwanie zaznaczonych produktów")
+                .setMessage("Czy na pewno chcesz usunąć zaznaczone produkty?")
+                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deleteAllSelectedProducts();
+                        Toast.makeText(ShoppingList.this, "Usunięto", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Nie", null)
+                .show();
+
+    }
+
+    private void deleteAllSelectedProducts() {
+
+        ArrayList<Integer> selectedProductsPositions = new ArrayList<>();
+
+        updateProductList();
+
+        for (Product product: products) {
+            if (product.isBought()) {
+                selectedProductsPositions.add(product.getId());
+            }
+        }
+
+        if (selectedProductsPositions.size() > 0) {
+            db.deleteAllSelectedProducts(selectedProductsPositions);
+            updateProductList();
+        } else {
+            Toast.makeText(ShoppingList.this, "Nie zaznaczono żadnych produktów do usunięcia", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     public void showAddProductPopUp(View view) {
@@ -145,19 +212,15 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
                     priceEditText.requestFocus();
                 } else {
                     price = priceEditText.getText().toString();
-                    products.add(new Product(productName, Double.valueOf(price)));
                     totalPrice += Double.valueOf(price);
                     priceEditText.setText("");
                     Toast.makeText(ShoppingList.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
-                    adapter.notifyDataSetChanged();
                     productEditText.setText("");
                     productEditText.requestFocus();
                 }
 
             } else {
-                products.add(new Product(productName));
                 // Toast.makeText(MainActivity.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
-                adapter.notifyDataSetChanged();
                 productEditText.setText("");
                 productEditText.requestFocus();
             }
@@ -166,9 +229,27 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
             totalPriceTextView.setText(String.format("%.2f", totalPrice));
 
             db.insertProduct(productName, price);
+            updateProductList();
             int numberOfRows = db.numberOfRows();
             Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void updateProductList() {
+
+        products.clear();
+        products.addAll(db.getProducts());
+
+        adapter = new ProductAdapter(products, this);
+        this.recyclerView.setAdapter(adapter);
+
+        totalPrice = getTotalPriceFromProductList(products);
+        boughtProductCounter = getBoughtItemCounterFromProductList(products);
+
+        productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
+        totalPriceTextView.setText(String.format("%.2f", totalPrice));
+        boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
+
     }
 
 
@@ -185,9 +266,7 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
 
 
         //products = initProducts();
-        products = db.getProducts();
-        totalPrice = getTotalPriceFromProductList(products);
-        boughtProductCounter = getBoughtItemCounterFromProductList(products);
+
         this.productCounterTextView = (TextView) findViewById(R.id.productCounterTextView);
         this.totalPriceTextView = (TextView) findViewById(R.id.totalPriceTextView);
         this.boughtProductCounterTextView = (TextView) findViewById(R.id.boughtProductCounterTextView);
@@ -196,15 +275,9 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         this.recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new ProductAdapter(products, this);
-        this.recyclerView.setAdapter(adapter);
-
-        productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
-        totalPriceTextView.setText(String.format("%.2f", totalPrice));
-        boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
-
         addProductDialog = new Dialog(this);
 
+        updateProductList();
 
         int numberOfRows = db.numberOfRows();
         Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
@@ -220,17 +293,16 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
 
         if (boughtCheckBox.isChecked()) {
             boughtCheckBox.setChecked(false);
-            db.updateIsBought(position, boughtCheckBox.isChecked());
             productTextView.setAlpha(1f);
             priceTextView.setAlpha(1f);
             boughtProductCounter--;
         } else {
             boughtCheckBox.setChecked(true);
-            db.updateIsBought(position, boughtCheckBox.isChecked());
             productTextView.setAlpha(0.25f);
             priceTextView.setAlpha(0.25f);
             boughtProductCounter++;
         }
+        db.updateIsBought(products.get(position).getId(), boughtCheckBox.isChecked());
         boughtProductCounterTextView.setText(String.valueOf(boughtProductCounter));
 
     }
