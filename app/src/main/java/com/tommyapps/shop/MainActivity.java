@@ -1,16 +1,21 @@
 package com.tommyapps.shop;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -18,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private ListView shoppingListView;
     private ArrayAdapter<String> shoppingListArrayAdapter;
+    private ArrayList<String> deleteShoppingListArray = new ArrayList<String>();
+    private boolean checkMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +71,119 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Toast.makeText(getApplicationContext(), shoppingList.get(i), Toast.LENGTH_SHORT).show();
+                if (checkMode) {
 
-                Intent intent = new Intent(MainActivity.this, ShoppingList.class);
-                intent.putExtra("shoppingList", shoppingList.get(i));
-                startActivity(intent);
+                    CheckedTextView checkedTextView = (CheckedTextView) view;
+
+                    if (checkedTextView.isChecked()) {
+                        checkedTextView.setChecked(false);
+                        deleteShoppingListArray.remove(shoppingList.get(i));
+                    } else {
+                        checkedTextView.setChecked(true);
+                        deleteShoppingListArray.add(shoppingList.get(i));
+                    }
+
+                } else {
+
+                    Toast.makeText(getApplicationContext(), shoppingList.get(i), Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(MainActivity.this, ShoppingList.class);
+                    intent.putExtra("shoppingList", shoppingList.get(i));
+                    startActivity(intent);
+                }
 
             }
         });
 
+        shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if (checkMode) {
+
+                    checkMode = false;
+                    shoppingListArrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, shoppingList);
+                    shoppingListView.setAdapter(shoppingListArrayAdapter);
+
+                } else {
+
+                    deleteShoppingListArray.clear();
+                    checkMode = true;
+                    shoppingListArrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_checked, shoppingList);
+                    shoppingListView.setAdapter(shoppingListArrayAdapter);
+
+                }
+
+                return false;
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.shopping_list_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case R.id.deleteAllSelectedShoppingLists:
+                showDeleteShoppingListAlert();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void showDeleteShoppingListAlert() {
+
+        if (deleteShoppingListArray.isEmpty()) {
+
+            Toast.makeText(this, "Nie zaznaczno żadnego elementu. Aby to zrobić, przytrzymaj dłużej na danej liście zakupów", Toast.LENGTH_SHORT).show();
+
+        } else {
+
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Usuwanie listy zakupów")
+                    .setMessage("Czy na pewno chcesz usunąć zaznaczone elementy?")
+                    .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            deleteShoppingLists();
+                            Toast.makeText(MainActivity.this, "Usunięto", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton("Nie", null)
+                    .show();
+        }
+
+    }
+
+    private void deleteShoppingLists() {
+
+        Database db = new Database(this);
+        db.deleteShoppingLists(deleteShoppingListArray);
+
+        for (String list : deleteShoppingListArray) {
+            shoppingList.remove(list);
+        }
+
+        sharedPreferences.edit().clear();
+        saveArray();
+
+        checkMode = false;
+        shoppingListArrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, shoppingList);
+        shoppingListView.setAdapter(shoppingListArrayAdapter);
+
+        shoppingListArrayAdapter.notifyDataSetChanged();
     }
 
     public void showAddShoppingListPopUp(View view) {

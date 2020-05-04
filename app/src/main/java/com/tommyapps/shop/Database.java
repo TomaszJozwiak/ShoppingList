@@ -25,7 +25,7 @@ public class Database extends SQLiteOpenHelper {
     private static final String PRODUCTS_COLUMN_IS_BOUGHT = "isBought";
     private static final String PRODUCTS_COLUMN_SHOPPING_LIST = "shoppingList";
 
-    public String shoppingListName = "Lista Kasi";
+    public String shoppingListName = "";
 
 
     public Database(@Nullable Context context) {
@@ -34,7 +34,7 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE products (id INTEGER PRIMARY KEY, product VARCHAR, price VARCHAR, isBought INTEGER, shoppingList VARCHAR)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, product VARCHAR, price VARCHAR, isBought INTEGER, shoppingList VARCHAR)");
     }
 
     @Override
@@ -131,5 +131,16 @@ public class Database extends SQLiteOpenHelper {
 
     public void setShoppingListTableName(String shoppingList) {
         this.shoppingListName = shoppingList;
+    }
+
+    public void deleteShoppingLists(ArrayList<String> shoppingList) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        for (String list : shoppingList) {
+
+            db.delete(PRODUCTS_TABLE_NAME, PRODUCTS_COLUMN_SHOPPING_LIST + " = ?", new String[] {list} );
+
+        }
+
     }
 }

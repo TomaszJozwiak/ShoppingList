@@ -264,7 +264,6 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
         db.setShoppingListTableName(intent.getStringExtra("shoppingList"));
         setTitle(intent.getStringExtra("shoppingList"));
 
-
         //products = initProducts();
 
         this.productCounterTextView = (TextView) findViewById(R.id.productCounterTextView);
