@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -136,6 +137,8 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
         addProductPopUpButton = (Button) addProductDialog.findViewById(R.id.addShoppingListPopUpButton);
         enablePriceCheckBox = (CheckBox) addProductDialog.findViewById(R.id.enablePriceCheckBox);
         priceTextViewAddProductPopup = (TextView) addProductDialog.findViewById(R.id.priceTextViewAddProductPopup);
+
+        priceEditText.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(6, 2)});
 
         enablePriceCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
