@@ -45,6 +45,7 @@ public class ProductAdapter extends RecyclerView.Adapter {
         public void onClick(View v) {
             onItemClickListener.onItemClick(v, getAdapterPosition());
         }
+
     }
 
     public interface OnItemClickListener{
@@ -56,9 +57,11 @@ public class ProductAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = (View) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
+
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
 
         return new ViewHolder(v, myOnItemClickListener);
+
     }
 
     @Override
@@ -89,7 +92,9 @@ public class ProductAdapter extends RecyclerView.Adapter {
         } else {
             return 0;
         }
+
     }
+
 }
 
 

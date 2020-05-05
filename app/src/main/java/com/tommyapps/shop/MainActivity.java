@@ -9,27 +9,20 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CheckedTextView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,15 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         sharedPreferences = this.getSharedPreferences("com.tommyapps.shop", Context.MODE_PRIVATE);
 
-        shoppingListView = (ListView) findViewById(R.id.shoppingListView);
+        shoppingListView = findViewById(R.id.shoppingListView);
 
         shoppingList = loadArray();
-
-       /* shoppingList.add("Tomek");
-        shoppingList.add("Kasia");
-        shoppingList.add("Maciek");
-        shoppingList.add("Alicja"); */
-
 
         shoppingListArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, shoppingList);
 
@@ -84,8 +71,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 } else {
-
-                    Toast.makeText(getApplicationContext(), shoppingList.get(i), Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(MainActivity.this, ShoppingList.class);
                     intent.putExtra("shoppingList", shoppingList.get(i));
@@ -176,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             shoppingList.remove(list);
         }
 
-        sharedPreferences.edit().clear();
+        sharedPreferences.edit().clear().apply();
         saveArray();
 
         checkMode = false;
@@ -184,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         shoppingListView.setAdapter(shoppingListArrayAdapter);
 
         shoppingListArrayAdapter.notifyDataSetChanged();
+
     }
 
     public void showAddShoppingListPopUp(View view) {
@@ -194,10 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
         addShoppingListDialog.setContentView(R.layout.add_shopping_list);
 
-        cancelShoppingListPopUpButton = (Button) addShoppingListDialog.findViewById(R.id.cancelShoppingListPopUpButton);
-        addShoppingListPopUpButton = (Button) addShoppingListDialog.findViewById(R.id.addShoppingListPopUpButton);
-        shoppingListEditText = (TextView) addShoppingListDialog.findViewById(R.id.shoppingListEditText);
-
+        cancelShoppingListPopUpButton = addShoppingListDialog.findViewById(R.id.cancelShoppingListPopUpButton);
+        addShoppingListPopUpButton = addShoppingListDialog.findViewById(R.id.addShoppingListPopUpButton);
+        shoppingListEditText = addShoppingListDialog.findViewById(R.id.shoppingListEditText);
 
         cancelShoppingListPopUpButton.setOnClickListener(new View.OnClickListener() {
             @Override

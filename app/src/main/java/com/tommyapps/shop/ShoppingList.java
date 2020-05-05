@@ -49,19 +49,6 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
     private double totalPrice = 0;
     private int boughtProductCounter = 0;
 
-    private ArrayList<Product> initProducts() {
-        ArrayList<Product> list = new ArrayList<>();
-
-        list.add(new Product("Ziemniaki", 3.39));
-        list.add(new Product("Piwko", 2.59));
-        list.add(new Product("Winko", 5));
-        list.add(new Product("Chipsy", 2.1));
-        list.add(new Product("Ziemniaksdafasdfasdfasdf asdf asdf asdf a sdf asdfi", 3.39));
-        list.add(new Product("Piwko", 2.59));
-
-        return list;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -82,6 +69,7 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
             default:
                 return false;
         }
+
     }
 
     private void showDeleteAllProductsAlert() {
@@ -131,12 +119,12 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
 
         addProductDialog.setContentView(R.layout.add_product);
 
-        productEditText = (EditText) addProductDialog.findViewById(R.id.shoppingListEditText);
-        priceEditText = (EditText) addProductDialog.findViewById(R.id.priceEditText);
-        cancelPopUpButton = (Button) addProductDialog.findViewById(R.id.cancelShoppingListPopUpButton);
-        addProductPopUpButton = (Button) addProductDialog.findViewById(R.id.addShoppingListPopUpButton);
-        enablePriceCheckBox = (CheckBox) addProductDialog.findViewById(R.id.enablePriceCheckBox);
-        priceTextViewAddProductPopup = (TextView) addProductDialog.findViewById(R.id.priceTextViewAddProductPopup);
+        productEditText = addProductDialog.findViewById(R.id.shoppingListEditText);
+        priceEditText = addProductDialog.findViewById(R.id.priceEditText);
+        cancelPopUpButton = addProductDialog.findViewById(R.id.cancelShoppingListPopUpButton);
+        addProductPopUpButton = addProductDialog.findViewById(R.id.addShoppingListPopUpButton);
+        enablePriceCheckBox = addProductDialog.findViewById(R.id.enablePriceCheckBox);
+        priceTextViewAddProductPopup = addProductDialog.findViewById(R.id.priceTextViewAddProductPopup);
 
         priceEditText.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(6, 2)});
 
@@ -196,7 +184,9 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
 
         addProductDialog.show();
         Window window = addProductDialog.getWindow();
-        window.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        if (window != null) {
+            window.setLayout(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        }
     }
 
 
@@ -220,21 +210,21 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
                     Toast.makeText(ShoppingList.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
                     productEditText.setText("");
                     productEditText.requestFocus();
+                    db.insertProduct(productName, price);
+                    updateProductList();
                 }
 
             } else {
-                // Toast.makeText(MainActivity.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ShoppingList.this, "Dodano produkt: " + productName, Toast.LENGTH_SHORT).show();
                 productEditText.setText("");
                 productEditText.requestFocus();
+                db.insertProduct(productName, price);
+                updateProductList();
             }
 
             productCounterTextView.setText(String.valueOf(adapter.getItemCount()));
             totalPriceTextView.setText(String.format("%.2f", totalPrice));
 
-            db.insertProduct(productName, price);
-            updateProductList();
-            int numberOfRows = db.numberOfRows();
-            Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -267,22 +257,17 @@ public class ShoppingList extends AppCompatActivity implements ProductAdapter.On
         db.setShoppingListTableName(intent.getStringExtra("shoppingList"));
         setTitle(intent.getStringExtra("shoppingList"));
 
-        //products = initProducts();
+        this.productCounterTextView = findViewById(R.id.productCounterTextView);
+        this.totalPriceTextView = findViewById(R.id.totalPriceTextView);
+        this.boughtProductCounterTextView = findViewById(R.id.boughtProductCounterTextView);
 
-        this.productCounterTextView = (TextView) findViewById(R.id.productCounterTextView);
-        this.totalPriceTextView = (TextView) findViewById(R.id.totalPriceTextView);
-        this.boughtProductCounterTextView = (TextView) findViewById(R.id.boughtProductCounterTextView);
-
-        this.recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        this.recyclerView = findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         this.recyclerView.setLayoutManager(mLayoutManager);
 
         addProductDialog = new Dialog(this);
 
         updateProductList();
-
-        int numberOfRows = db.numberOfRows();
-        Toast.makeText(this, String.valueOf(numberOfRows), Toast.LENGTH_SHORT).show();
 
     }
 

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Shop</string>
+    <string name="produkt">Produkt</string>
+    <string name="nazwa_produktu">Nazwa Produktu</string>
+    <string name="produkty">Produkty</string>
+    <string name="kupiono">Kupiono</string>
+    <string name="suma">Suma</string>
+    <string name="ustaw_cen_opcjonalnie">Ustaw cenę (opcjonalnie)</string>
+    <string name="cena">Cena</string>
+    <string name="dodaj_produkt">Dodaj</string>
+    <string name="nazwa_listy">Nazwa listy</string>
+    <string name="nazwa_listy_zakupów">Nazwa Listy</string>
+    <string name="dodaj_shopping_list">Dodaj</string>
 </resources>

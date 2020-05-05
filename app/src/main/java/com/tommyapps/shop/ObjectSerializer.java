@@ -1,7 +1,5 @@
 package com.tommyapps.shop;
 
-import android.util.Log;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +12,7 @@ public class ObjectSerializer {
 
 
     public static String serialize(Serializable obj) throws IOException {
+
         if (obj == null) return "";
         try {
             ByteArrayOutputStream serialObj = new ByteArrayOutputStream();
@@ -24,9 +23,11 @@ public class ObjectSerializer {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public static Object deserialize(String str) throws IOException {
+
         if (str == null || str.length() == 0) return null;
         try {
             ByteArrayInputStream serialObj = new ByteArrayInputStream(decodeBytes(str));
@@ -35,9 +36,11 @@ public class ObjectSerializer {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public static String encodeBytes(byte[] bytes) {
+
         StringBuffer strBuf = new StringBuffer();
 
         for (int i = 0; i < bytes.length; i++) {
@@ -46,9 +49,11 @@ public class ObjectSerializer {
         }
 
         return strBuf.toString();
+
     }
 
     public static byte[] decodeBytes(String str) {
+
         byte[] bytes = new byte[str.length() / 2];
         for (int i = 0; i < str.length(); i+=2) {
             char c = str.charAt(i);
@@ -57,6 +62,7 @@ public class ObjectSerializer {
             bytes[i/2] += (c - 'a');
         }
         return bytes;
+
     }
 
 }

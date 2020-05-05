@@ -11,7 +11,7 @@
         android:id="@+id/shoppingListTextViewAddProductPopup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nazwa listy"
+        android:text="@string/nazwa_listy"
         android:textColor="#FFEB3B"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -28,11 +28,12 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:ems="10"
-        android:hint="Nazwa Listy"
+        android:hint="@string/nazwa_listy_zakupów"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/shoppingListTextViewAddProductPopup" />
+        app:layout_constraintTop_toBottomOf="@+id/shoppingListTextViewAddProductPopup"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/addShoppingListPopUpButton"
@@ -43,7 +44,7 @@
         android:layout_marginBottom="20dp"
         android:background="@drawable/button_with_round_corners_green"
         android:minWidth="150dp"
-        android:text="Dodaj"
+        android:text="@string/dodaj_shopping_list"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/shoppingListEditText" />

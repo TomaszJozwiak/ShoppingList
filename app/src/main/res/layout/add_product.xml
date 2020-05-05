@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/addProductPopUpConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,7 +11,7 @@
         android:id="@+id/productTextViewAddProductPopup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Produkt"
+        android:text="@string/produkt"
         android:textColor="#FFEB3B"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -29,17 +28,18 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:ems="10"
-        android:hint="Nazwa Produktu"
+        android:hint="@string/nazwa_produktu"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productTextViewAddProductPopup" />
+        app:layout_constraintTop_toBottomOf="@+id/productTextViewAddProductPopup"
+        android:importantForAutofill="no" />
 
     <CheckBox
         android:id="@+id/enablePriceCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ustaw cenę (opcjonalnie)"
+        android:text="@string/ustaw_cen_opcjonalnie"
         android:textColor="#FFEB3B"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/priceTextViewAddProductPopup"
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:alpha="0.3"
         android:enabled="false"
-        android:text="Cena"
+        android:text="@string/cena"
         android:textColor="#FFEB3B"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -71,11 +71,12 @@
         android:alpha="0.5"
         android:ems="10"
         android:enabled="false"
-        android:hint="Cena"
+        android:hint="@string/cena"
         android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/priceTextViewAddProductPopup" />
+        app:layout_constraintTop_toBottomOf="@+id/priceTextViewAddProductPopup"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/addShoppingListPopUpButton"
@@ -85,7 +86,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/button_with_round_corners_green"
         android:minWidth="150dp"
-        android:text="Dodaj"
+        android:text="@string/dodaj_produkt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/priceTextViewAddProductPopup"
         app:layout_constraintTop_toBottomOf="@+id/priceEditText" />

@@ -6,9 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQuery;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -25,7 +22,7 @@ public class Database extends SQLiteOpenHelper {
     private static final String PRODUCTS_COLUMN_IS_BOUGHT = "isBought";
     private static final String PRODUCTS_COLUMN_SHOPPING_LIST = "shoppingList";
 
-    public String shoppingListName = "";
+    private String shoppingListName = "";
 
 
     public Database(@Nullable Context context) {
@@ -45,9 +42,6 @@ public class Database extends SQLiteOpenHelper {
 
     public int numberOfRows(){
         SQLiteDatabase db = this.getReadableDatabase();
-       // db.execSQL("INSERT INTO products (product, price, isBought) VALUES ('Alicja', 2.69, 1)");
-        //db.execSQL("DELETE FROM products");
-       // this.onUpgrade(db, 0, 1);
         int numRows = (int) DatabaseUtils.queryNumEntries(db, PRODUCTS_TABLE_NAME);
         return numRows;
     }
@@ -83,6 +77,7 @@ public class Database extends SQLiteOpenHelper {
 
     public ArrayList<Product> getProducts()
     {
+
         SQLiteDatabase db = this.getReadableDatabase();
 
         ArrayList<Product> products = new ArrayList<Product>();
@@ -122,9 +117,7 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         for (Integer id : selectedProductsId) {
-
             db.delete(PRODUCTS_TABLE_NAME, PRODUCTS_COLUMN_ID + " = ?", new String[] {Integer.toString(id)} );
-
         }
 
     }
@@ -137,10 +130,9 @@ public class Database extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         for (String list : shoppingList) {
-
             db.delete(PRODUCTS_TABLE_NAME, PRODUCTS_COLUMN_SHOPPING_LIST + " = ?", new String[] {list} );
-
         }
 
     }
+
 }
